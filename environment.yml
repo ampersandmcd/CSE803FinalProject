@@ -1,0 +1,20 @@
+name: CVProj
+channels:
+  - pytorch
+  - conda-forge
+dependencies:
+  - python=3.7
+  - pytorch-lightning
+  # Xarray and deps
+  - xarray
+  - dask
+  - netCDF4
+  - bottleneck
+  #
+  - matplotlib
+  # Pytorch install
+  - pytorch
+  - torchaudio
+  - torchvision
+  # If you have access to cuda match this to your cuda version
+  # - cudatoolkit=10.2
