@@ -75,6 +75,7 @@ class ERA5Data(pl.LightningDataModule):
     def test_dataloader(self):
         return self.get_batch(self.test_data)
 
+
 if __name__ == "__main__":
     e = ERA5Data(args={"pool_size": 4})
     td = e.train_dataloader()
