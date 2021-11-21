@@ -34,6 +34,9 @@
 # ignore zips
 *.zip
 
+# ignore netCDF data
+*.nc
+
 # ignore pycharm and vscode
 .idea/
 __pycache__/
