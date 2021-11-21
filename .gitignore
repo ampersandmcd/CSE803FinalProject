@@ -42,3 +42,6 @@
 __pycache__/
 .vscode/
 .ipynb_checkpoints
+
+# ignore lightning logs
+lightning_logs
