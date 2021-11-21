@@ -1,0 +1,41 @@
+# ignore synctex files
+*.synctex.gz
+
+# ignore backup files
+*.bak
+
+# ignore temp TeX files
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.aux
+
+# ignore shapefiles / geographic data
+*.tif
+*.shp
+*.shx
+*.dbf
+*.prj
+*.cpg
+*.xml
+
+# ignore PDFs
+*.pdf
+
+# ignore videos
+*.mp4
+
+# ignore docs
+*.docx
+
+# ignore zips
+*.zip
+
+# ignore pycharm and vscode
+.idea/
+__pycache__/
+.vscode/
+.ipynb_checkpoints
