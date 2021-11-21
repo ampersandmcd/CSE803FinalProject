@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 import torch
 import xarray as xr
 import pytorch_lightning as pl
@@ -73,3 +74,13 @@ class ERA5Data(pl.LightningDataModule):
 
     def test_dataloader(self):
         return self.get_batch(self.test_data)
+
+if __name__ == "__main__":
+    e = ERA5Data(args={"pool_size": 4})
+    td = e.train_dataloader()
+    batch = next(td)
+    fig, ax = plt.subplots(6, 2, figsize=(4, 12))
+    for i in range(6):
+        ax[i, 0].imshow(batch["x"][i])
+        ax[i, 1].imshow(batch["y"][i])
+    plt.show()
