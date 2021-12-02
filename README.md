@@ -4,6 +4,9 @@ A space for code and data associated with the final project in CSE 803 with Prof
 
 #### Installation
 Using conda for the larger packages
+
+If you're using the HPCC be sure to uncomment the cudatoolkit line in the `environment.yml`.
+If you're on a different machine with CUDA change the toolkit version to match your system.
 ```bash
 conda env create -f environment.yml
 conda activate CVProj
