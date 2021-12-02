@@ -20,7 +20,7 @@ class BaseModel(pl.LightningModule):
         pass
 
     def configure_optimizers(self):
-        pass
+        return torch.optim.Adam(self.parameters())
 
 
 class SRCNN(BaseModel):
