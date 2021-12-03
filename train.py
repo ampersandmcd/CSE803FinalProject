@@ -2,6 +2,9 @@ from argparse import ArgumentParser
 from models import SRCNN
 from data import ERA5DataModule
 import pytorch_lightning as pl
+import wandb
+
+wandb.init(project='cv-proj', entity="cv803f21-superres")
 
 
 def main(args):
@@ -17,7 +20,13 @@ def main(args):
     # ...etc.
     model = SRCNN(input_channels=[1], output_channels=[1])
 
-    trainer = pl.Trainer.from_argparse_args(args)
+    # Wandb logging
+    wandb_logger = pl.loggers.WandbLogger(project='cv-proj')
+    wandb_logger.watch(model)
+
+    trainer: pl.Trainer = pl.Trainer.from_argparse_args(args)
+    trainer.logger = wandb_logger
+
     trainer.fit(model, train_dl, val_dl)
 
 

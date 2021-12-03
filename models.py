@@ -11,6 +11,7 @@ class BaseModel(pl.LightningModule):
             output_channels: list = [0, 1],     # indices of tensor target channels to predict (0=t2m, 1=tp)
     ):
         super().__init__()
+        self.save_hyperparameters()
         self.input_channels = input_channels
         self.output_channels = output_channels
         self.input_dim = len(input_channels)

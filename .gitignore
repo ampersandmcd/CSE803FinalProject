@@ -45,3 +45,7 @@ __pycache__/
 
 # ignore lightning logs
 lightning_logs
+
+# wandb
+cv-proj/
+wandb/
