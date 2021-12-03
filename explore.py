@@ -106,10 +106,10 @@ def visualize_pool(data, year, month, variable, row, col, pool=2, size=32, save=
 
 if __name__ == "__main__":
     data = xr.open_dataset(f"era5.nc")
-    visualize(data, 1950, 4, "t2m")
     visualize(data, 2020, 4, "t2m")
-    visualize_patches(data, 1950, 4, "t2m", size=32)
+    visualize(data, 2020, 4, "tp")
     visualize_patches(data, 2020, 4, "t2m", size=32)
+    visualize_patches(data, 2020, 4, "tp", size=32)
     visualize_pool(data, 2020, 4, "t2m", row=98, col=192, pool=2)
     visualize_pool(data, 2020, 4, "t2m", row=98, col=192, pool=4)
     visualize_pool(data, 2020, 4, "t2m", row=98, col=192, pool=8)
