@@ -9,19 +9,24 @@ from matplotlib import cm
 
 class ERA5Data(Dataset):
 
-    def __init__(self, data: list[xr.Dataset], patch_size: int, pool_size: int, pool_type: int):
+    def __init__(self, datasets: list[xr.Dataset], patch_size: int, pool_size: int, pool_type: int):
         # each element of data is an xr.Dataset representing a different physical variable
         # in our case, data = [t2m, tp] = [temp @ 2 meters, total precipitation]
         # we can think of each element of data as representing a different image channel
         # we merge these channels into a single c x h x w tensor in __getitem__
-        self.datasets = data
+        self.datasets = datasets
         self.patch_size = patch_size
         self.pool_size = pool_size
         self.pool_type = pool_type
         self.n_channels = len(self.datasets)
-        self.n_months = data[0].shape[0]
-        self.n_vertical = data[0].shape[1] // patch_size
-        self.n_horizontal = data[0].shape[2] // patch_size
+        self.n_months = datasets[0].shape[0]
+        self.n_vertical = datasets[0].shape[1] // patch_size
+        self.n_horizontal = datasets[0].shape[2] // patch_size
+        for dataset in self.datasets:
+            mu = np.nanmean(dataset.values)
+            s = np.nanstd(dataset.values)
+            dataset.values = (dataset.values - mu) / s
+
 
     def __len__(self):
         return self.n_months * self.n_vertical * self.n_horizontal
@@ -34,10 +39,10 @@ class ERA5Data(Dataset):
         patch = i % (self.n_vertical * self.n_horizontal)
 
         # e.g., if each image is (h, w) = (5, 20) then patch 27 corresponds to 2nd row and 27 // 20 = 1
-        row = patch // self.n_vertical
+        row = patch // self.n_horizontal
 
         # e.g., if each image is (h, w) = (5, 20) then patch 27 corresponds to 8th col and 27 % 20 = 7
-        col = patch % self.n_vertical
+        col = patch % self.n_horizontal
 
         # extract patch for this month, this vertical offset, and this horizontal offset by collating channels
         ps = self.patch_size

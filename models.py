@@ -7,18 +7,30 @@ import pytorch_lightning as pl
 class BaseModel(pl.LightningModule):
     def __init__(
             self,
-            input_dim: int = 1,
-            output_dim: int = 1,
+            input_channels: list = [0, 1],      # indices of tensor input channels to consider (0=t2m, 1=tp)
+            output_channels: list = [0, 1],     # indices of tensor target channels to predict (0=t2m, 1=tp)
     ):
         super().__init__()
-        self.input_dim = input_dim
-        self.output_dim = output_dim
+        self.input_channels = input_channels
+        self.output_channels = output_channels
+        self.input_dim = len(input_channels)
+        self.output_dim = len(output_channels)
 
-    def training_step(self):
-        pass
+    def training_step(self, batch, batch_idx):
+        x = batch['x'][:, self.input_channels, :, :]
+        y = batch['y'][:, self.output_channels, :, :]
+        y_hat = self(x)
+        loss = F.mse_loss(y, y_hat)
+        self.log('train_loss', loss)
+        return loss
 
-    def validation_step(self):
-        pass
+    def validation_step(self, batch, batch_idx):
+        x = batch['x'][:, self.input_channels, :, :]
+        y = batch['y'][:, self.output_channels, :, :]
+        y_hat = self(x)
+        loss = F.mse_loss(y, y_hat)
+        self.log('val_loss', loss)
+        return loss
 
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters())
@@ -48,24 +60,6 @@ class SRCNN(BaseModel):
             nn.ReLU(),
             nn.Conv2d(in_channels=self.hidden_2, out_channels=self.output_dim, kernel_size=self.kernel_3, padding=self.kernel_3//2, padding_mode="zeros"),
         )
-
-    def training_step(self, batch, batch_idx):
-        x, y = batch['x'], batch['y']
-        x.unsqueeze_(dim=1)
-        y.unsqueeze_(dim=1)
-        y_hat = self(x)
-        loss = F.mse_loss(y, y_hat)
-        self.log('train_loss', loss)
-        return loss
-
-    def validation_step(self, batch, batch_idx):
-        x, y = batch['x'], batch['y']
-        x.unsqueeze_(dim=1)
-        y.unsqueeze_(dim=1)
-        y_hat = self(x)
-        loss = F.mse_loss(y, y_hat)
-        self.log('val_loss', loss)
-        return loss
 
     def forward(self, x):
         return self.layers(x)
