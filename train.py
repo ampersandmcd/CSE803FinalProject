@@ -12,7 +12,7 @@ wandb.init(project='cv-proj', entity="cv803f21-superres")
 def main(args):
     # Data
     e = ERA5DataModule(args={"pool_size": 4})
-    train_dl, val_dl = e.val_dataloader(), e.val_dataloader()
+    train_dl, val_dl = e.train_dataloader(), e.val_dataloader()
     val_samples = [e.val_data[10]]
 
     # input channels controls which channels we use as predictors
