@@ -1,3 +1,4 @@
+from typing import List
 import numpy as np
 import matplotlib.pyplot as plt
 import torch
@@ -9,7 +10,7 @@ from matplotlib import cm
 
 class ERA5Data(Dataset):
 
-    def __init__(self, datasets: list[xr.Dataset], patch_size: int, pool_size: int, pool_type: int):
+    def __init__(self, datasets: List[xr.Dataset], patch_size: int, pool_size: int, pool_type: int):
         # each element of data is an xr.Dataset representing a different physical variable
         # in our case, data = [t2m, tp] = [temp @ 2 meters, total precipitation]
         # we can think of each element of data as representing a different image channel
