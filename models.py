@@ -72,12 +72,11 @@ class SRCNN(BaseModel):
     def training_step(self, batch, batch_idx):
         x = batch['x'][:, self.input_channels, :, :]
         y = batch['y'][:, self.output_channels, :, :]
-        y_hat = self(x)
-        if not self.padding:
-            o = (y.shape[-2] - y_hat.shape[-2]) // 2
-            loss = F.mse_loss(y_hat, y[:,:,o:o + y_hat.shape[-2], o:o + y_hat.shape[-2]])
-        else:
-            loss = F.mse_loss(y_hat, y)
+        y_hat = self(x)    
+        o = 6 # Hardcoded the offset of where the padding effects are present #(y.shape[-2] - y_hat.shape[-2]) // 2
+        loss = F.mse_loss( # Look at only the non-padding portions
+            y_hat[:,:,o:o + y_hat.shape[-2], o:o + y_hat.shape[-2]],
+            y[:,:,o:o + y_hat.shape[-2], o:o + y_hat.shape[-2]])
         self.log('train_loss', loss)
         return loss
 
