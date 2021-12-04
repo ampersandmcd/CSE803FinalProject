@@ -11,7 +11,7 @@ wandb.init(project='cv-proj', entity="cv803f21-superres")
 
 def main(args):
     # Data
-    e = ERA5DataModule(args={"pool_size": 4})
+    e = ERA5DataModule(args={"pool_size": 4, "batch_size": 64, "patch_size": 64})
     train_dl, val_dl = e.train_dataloader(), e.val_dataloader()
     val_samples = [e.val_data[10]]
 
