@@ -45,6 +45,7 @@ class SRCNN(BaseModel):
             kernel_1: int = 9,      # f_1
             kernel_2: int = 1,      # f_2
             kernel_3: int = 5,      # f_3
+            padding: bool = True,
             **kwargs
     ):
         super().__init__(**kwargs)
@@ -53,14 +54,44 @@ class SRCNN(BaseModel):
         self.kernel_1 = kernel_1
         self.kernel_2 = kernel_2
         self.kernel_3 = kernel_3
+        self.padding = padding
+
+        extra_args = {}
+        if self.padding:
+            extra_args['padding'] = 'same'
+            extra_args['padding_mode'] = 'zeros'
 
         self.layers = nn.Sequential(
-            nn.Conv2d(in_channels=self.input_dim, out_channels=self.hidden_1, kernel_size=self.kernel_1, padding=self.kernel_1//2, padding_mode="zeros"),
+            nn.Conv2d(in_channels=self.input_dim, out_channels=self.hidden_1, kernel_size=self.kernel_1, **extra_args),
             nn.ReLU(),
-            nn.Conv2d(in_channels=self.hidden_1, out_channels=self.hidden_2, kernel_size=self.kernel_2, padding=self.kernel_2//2, padding_mode="zeros"),
+            nn.Conv2d(in_channels=self.hidden_1, out_channels=self.hidden_2, kernel_size=self.kernel_2, **extra_args),
             nn.ReLU(),
-            nn.Conv2d(in_channels=self.hidden_2, out_channels=self.output_dim, kernel_size=self.kernel_3, padding=self.kernel_3//2, padding_mode="zeros"),
+            nn.Conv2d(in_channels=self.hidden_2, out_channels=self.output_dim, kernel_size=self.kernel_3, **extra_args),
         )
+
+    def training_step(self, batch, batch_idx):
+        x = batch['x'][:, self.input_channels, :, :]
+        y = batch['y'][:, self.output_channels, :, :]
+        y_hat = self(x)
+        if not self.padding:
+            o = (y.shape[-2] - y_hat.shape[-2]) // 2
+            loss = F.mse_loss(y_hat, y[:,:,o:o + y_hat.shape[-2], o:o + y_hat.shape[-2]])
+        else:
+            loss = F.mse_loss(y_hat, y)
+        self.log('train_loss', loss)
+        return loss
+
+    def validation_step(self, batch, batch_idx):
+        x = batch['x'][:, self.input_channels, :, :]
+        y = batch['y'][:, self.output_channels, :, :]
+        y_hat = self(x)
+        if not self.padding:
+            o = (y.shape[-2] - y_hat.shape[-2]) // 2
+            loss = F.mse_loss(y_hat, y[:,:,o:o + y_hat.shape[-2], o:o + y_hat.shape[-2]])
+        else:
+            loss = F.mse_loss(y_hat, y)
+        self.log('val_loss', loss)
+        return loss
 
     def forward(self, x):
         return self.layers(x)
