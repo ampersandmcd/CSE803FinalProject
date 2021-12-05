@@ -64,7 +64,7 @@ class SRCNN(BaseModel):
         extra_args = {}
         if self.padding:
             extra_args["padding"] = "same"
-            extra_args["padding_mode"] = "zeros"
+            extra_args["padding_mode"] = "replicate"
 
         self.layers = nn.Sequential(
             nn.Conv2d(in_channels=self.input_dim, out_channels=self.hidden_1, kernel_size=self.kernel_1, **extra_args),
@@ -74,6 +74,14 @@ class SRCNN(BaseModel):
             nn.Conv2d(in_channels=self.hidden_2, out_channels=self.output_dim, kernel_size=self.kernel_3, **extra_args),
         )
 
+    def training_step(self, batch, batch_idx):
+        x = batch['x'][:, self.input_channels, :, :]
+        y = batch['y'][:, self.output_channels, :, :]
+        y_hat = self(x)    
+        loss = F.mse_loss(y_hat, y)
+        self.log('train_loss', loss)
+        return loss
+        
     def forward(self, x):
         return self.layers(x)
 
