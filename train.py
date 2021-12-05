@@ -11,11 +11,11 @@ wandb.init(project='cv-proj', entity="cv803f21-superres")
 
 
 def main(args):
-    # Data
+    # configure data module
     e = ERA5DataModule(args={
-        "pool_size": args.pool_size if hasattr(args, "pool_size") else 4,
-        "batch_size": args.batch_size if hasattr(args, "batch_size") else 128,
-        "patch_size": args.patch_size if hasattr(args, "patch_size") else 64
+        "pool_size": args.pool_size,
+        "batch_size": args.batch_size,
+        "patch_size": args.patch_size
     })
     train_dl, val_dl = e.train_dataloader(), e.val_dataloader()
     val_samples = [e.val_data[10]]
@@ -51,8 +51,10 @@ def main(args):
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser = pl.Trainer.add_argparse_args(parser)
-    parser.add_argument('--model')
-    parser.add_argument('--batch_size', type=int)
+    parser.add_argument('--model', default="SRCNN", type=str, help="Model to train")
+    parser.add_argument('--batch_size', default=128, type=int, help="Batch size to train with")
+    parser.add_argument('--pool_size', default=4, type=int, help="Super-resolution factor")
+    parser.add_argument('--patch_size', default=64, type=int, help="Image patch size to super-resolve")
     args = parser.parse_args()
 
     main(args)
