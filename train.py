@@ -1,6 +1,6 @@
 import os
 from argparse import ArgumentParser
-from models import SRCNN, VDSR
+from models import SRCNN, VDSR, SRResNet
 from data import ERA5DataModule
 import pytorch_lightning as pl
 import wandb
@@ -32,7 +32,7 @@ def main(args):
         model = VDSR(input_channels=[0, 1], output_channels=[0, 1])
     elif args.model == "SRResNet":
         print("Constructing SRResNet")
-        raise NotImplementedError()
+        model = SRResNet(input_channels=[0, 1], output_channels=[0, 1])
     else:
         print("Constructing SRCNN")
         model = SRCNN(input_channels=[0, 1], output_channels=[0, 1])
