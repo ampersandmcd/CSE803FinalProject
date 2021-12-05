@@ -114,7 +114,8 @@ class VDSR(BaseModel):
         self.layers = nn.Sequential(*layers)
 
     def forward(self, x):
-        return x + self.layers(x)
+        x = x + self.layers(x)
+        return x
 
 
 class SRResNet(BaseModel):
