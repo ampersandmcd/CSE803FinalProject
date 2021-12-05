@@ -38,6 +38,11 @@ class BaseModel(pl.LightningModule):
 
 
 class SRCNN(BaseModel):
+    """
+    Image Super-Resolution Using Deep Convolutional Networks
+    Chao Dong, Chen Change Loy, Kaiming He, and Xiaoou Tang
+    https://arxiv.org/pdf/1501.00092.pdf
+    """
     def __init__(
             self,
             hidden_1: int = 64,     # n_1 in the paper
@@ -71,5 +76,36 @@ class SRCNN(BaseModel):
 
     def forward(self, x):
         return self.layers(x)
+
+
+class VDSR(BaseModel):
+    """
+    Accurate Image Super-Resolution Using Very Deep Convolutional Networks
+    Jiwon Kim, Jung Kwon Lee and Kyoung Mu Lee
+    https://arxiv.org/pdf/1511.04587.pdf
+    """
+    def __init__(
+            self,
+            d: int = 20,                # d=20 in the paper
+            kernel: int = 3,            # k=3 in the paper
+            hidden_dim: int = 64,       # hidden_dim=64 in the paper
+            **kwargs
+    ):
+        super().__init__(**kwargs)
+        self.d = d
+        self.kernel = kernel
+        self.hidden_dim = hidden_dim
+
+        layers = []
+        layers.append(nn.Conv2d(in_channels=self.input_dim, out_channels=self.hidden_dim, kernel_size=self.kernel, padding="same", padding_mode="replicate"))
+        layers.append(nn.ReLU())
+        for _ in range(d-2):
+            layers.append(nn.Conv2d(in_channels=self.hidden_dim, out_channels=self.hidden_dim, kernel_size=self.kernel, padding="same", padding_mode="replicate"))
+            layers.append(nn.ReLU())
+        layers.append(nn.Conv2d(in_channels=self.hidden_dim, out_channels=self.output_dim, kernel_size=self.kernel, padding="same", padding_mode="replicate"))
+        self.layers = nn.Sequential(*layers)
+
+    def forward(self, x):
+        return x + self.layers(x)
 
 
