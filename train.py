@@ -51,6 +51,7 @@ def main(args):
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser = pl.Trainer.add_argparse_args(parser)
+    parser.add_argument('--model')
     args = parser.parse_args()
 
     main(args)
