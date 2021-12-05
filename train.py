@@ -1,5 +1,6 @@
+import os
 from argparse import ArgumentParser
-from models import SRCNN
+from models import SRCNN, VDSR
 from data import ERA5DataModule
 import pytorch_lightning as pl
 import wandb
@@ -11,7 +12,11 @@ wandb.init(project='cv-proj', entity="cv803f21-superres")
 
 def main(args):
     # Data
-    e = ERA5DataModule(args={"pool_size": 4, "batch_size": 64, "patch_size": 64})
+    e = ERA5DataModule(args={
+        "pool_size": args.pool_size if hasattr(args, "pool_size") else 4,
+        "batch_size": args.batch_size if hasattr(args, "batch_size") else 128,
+        "patch_size": args.patch_size if hasattr(args, "patch_size") else 64
+    })
     train_dl, val_dl = e.train_dataloader(), e.val_dataloader()
     val_samples = [e.val_data[10]]
 
@@ -21,7 +26,16 @@ def main(args):
     # e.g., input_channels=[0, 1], output_channels=[1] predicts tp @ HR using t2m AND tp @ LR
     # e.g., input_channels=[1],    output_channels=[1] predicts tp @ HR using ONLY tp @ LR
     # ...etc.
-    model = SRCNN(input_channels=[0,1], output_channels=[0,1])
+    args.model = args.model if hasattr(args, "model") else "SRCNN"
+    if args.model == "VDSR":
+        print("Constructing VDSR")
+        model = VDSR(input_channels=[0, 1], output_channels=[0, 1])
+    elif args.model == "SRResNet":
+        print("Constructing SRResNet")
+        raise NotImplementedError()
+    else:
+        print("Constructing SRCNN")
+        model = SRCNN(input_channels=[0, 1], output_channels=[0, 1])
 
     # Wandb logging
     wandb_logger = pl.loggers.WandbLogger(project='cv-proj')
