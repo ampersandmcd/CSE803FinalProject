@@ -59,7 +59,7 @@ class SRCNN(BaseModel):
         extra_args = {}
         if self.padding:
             extra_args['padding'] = 'same'
-            extra_args['padding_mode'] = 'zeros'
+            extra_args['padding_mode'] = 'replicate'
 
         self.layers = nn.Sequential(
             nn.Conv2d(in_channels=self.input_dim, out_channels=self.hidden_1, kernel_size=self.kernel_1, **extra_args),
@@ -73,10 +73,12 @@ class SRCNN(BaseModel):
         x = batch['x'][:, self.input_channels, :, :]
         y = batch['y'][:, self.output_channels, :, :]
         y_hat = self(x)    
-        o = 6 # Hardcoded the offset of where the padding effects are present #(y.shape[-2] - y_hat.shape[-2]) // 2
-        loss = F.mse_loss( # Look at only the non-padding portions
-            y_hat[:,:,o:o + y_hat.shape[-2], o:o + y_hat.shape[-2]],
-            y[:,:,o:o + y_hat.shape[-2], o:o + y_hat.shape[-2]])
+        # o = 6 # Hardcoded the offset of where the padding effects are present #(y.shape[-2] - y_hat.shape[-2]) // 2
+        if not self.padding:
+            o = (y.shape[-2] - y_hat.shape[-2]) // 2
+            loss = F.mse_loss(y_hat, y[:,:,o:o + y_hat.shape[-2], o:o + y_hat.shape[-2]])
+        else:
+            loss = F.mse_loss(y_hat, y)
         self.log('train_loss', loss)
         return loss
 
