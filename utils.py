@@ -1,3 +1,4 @@
+import os
 import torch
 import wandb
 import pytorch_lightning as pl
@@ -17,7 +18,8 @@ class ImageVisCallback(pl.Callback):
 
         mosaics = torch.cat([imgs, upresed], dim=-2)
         caption = "Top: Low Res, Bottom: High Res"
+        logname = "val/examples" if os.name != "nt" else "val\examples"
         trainer.logger.experiment.log({
-            "val/examples": [wandb.Image(mosaic, caption) for mosaic in mosaics],
+            logname: [wandb.Image(mosaic, caption) for mosaic in mosaics],
             "global_step": trainer.global_step # This will make sure wandb gets the epoch/step right
         })
