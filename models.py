@@ -34,7 +34,6 @@ class BaseModel(pl.LightningModule):
         self.log('val_loss', loss)
         
         # SSIM 
-        sloss = ssim(y.detach().cpu().numpy(), y_hat.detach().cpu().numpy())
         self.log('val_ssim', sloss)
 
         return loss
