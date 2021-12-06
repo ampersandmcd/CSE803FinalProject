@@ -1,7 +1,8 @@
+import pytorch_lightning as pl
+from skimage.metrics import structural_similarity as ssim
 import torch.nn as nn
 import torch.nn.functional as F
 import torch
-import pytorch_lightning as pl
 
 
 class BaseModel(pl.LightningModule):
@@ -31,6 +32,11 @@ class BaseModel(pl.LightningModule):
         y_hat = self(x)
         loss = F.mse_loss(y, y_hat)
         self.log('val_loss', loss)
+        
+        # SSIM 
+        sloss = ssim(y.detach().cpu().numpy(), y_hat.detach().cpu().numpy())
+        self.log('val_ssim', sloss)
+
         return loss
 
     def configure_optimizers(self):
