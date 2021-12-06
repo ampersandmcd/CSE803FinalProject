@@ -18,7 +18,7 @@ def main(args):
     elif args.model.lower() == 'vdsr':
         model = VDSR
 
-    model = model.load_from_checkpoint('cv-proj/vu4bzk0a/checkpoints/epoch=176-step=59825.ckpt')
+    model = model.load_from_checkpoint(args.checkpoint)
 
     trainer = pl.Trainer()
 
@@ -29,7 +29,7 @@ if __name__ == "__main__":
 
     parser = pl.Trainer.add_argparse_args(parser)
     parser.add_argument('--model', default="SRCNN", type=str, help="Model to train")
-    parser.add_argument('--checkpoint', type=str, help="Folder with checkpoints")
+    parser.add_argument('--checkpoint', type=str, help="Checkpoint file (.ckpt)")
     parser.add_argument('--pool_size', default=4, type=int, help="Super-resolution factor")
 
     args = parser.parse_args()
