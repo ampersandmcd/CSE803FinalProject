@@ -33,8 +33,6 @@ class BaseModel(pl.LightningModule):
         loss = F.mse_loss(y_hat, y)
         self.log('val_loss', loss)
         
-        # SSIM 
-        self.log('val_ssim', sloss)
 
         return loss
 
