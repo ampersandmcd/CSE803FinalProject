@@ -8,9 +8,10 @@ from torch.utils.data import Dataset, DataLoader
 from torch.utils.data.dataloader import default_collate
 from matplotlib import cm
 
+
 class ERA5Data(Dataset):
 
-    def __init__(self, datasets: List[xr.Dataset], patch_size: int, pool_size: int, pool_type: int):
+    def __init__(self, datasets: List[xr.Dataset], patch_size: int, pool_size: int, pool_type: str):
         # each element of data is an xr.Dataset representing a different physical variable
         # in our case, data = [t2m, tp] = [temp @ 2 meters, total precipitation]
         # we can think of each element of data as representing a different image channel
@@ -139,7 +140,7 @@ class ERA5DataModule(pl.LightningDataModule):
 
     def __init__(self, args):
         # setup construction parameters
-        self.patch_size = args.get("patch_size", 32)
+        self.patch_size = args.get("patch_size", 64)
         self.pool_size = args.get("pool_size", 2)
         self.pool_type = args.get("pool_type", "mean")
 

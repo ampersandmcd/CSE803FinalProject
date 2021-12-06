@@ -1,5 +1,7 @@
+import numpy as np
 import pytorch_lightning as pl
 from skimage.metrics import structural_similarity as ssim
+from skimage.metrics import peak_signal_noise_ratio as psnr
 import torch.nn as nn
 import torch.nn.functional as F
 import torch
@@ -44,9 +46,16 @@ class BaseModel(pl.LightningModule):
         def _ssim_trans(x):
             return x.detach().cpu().permute(0, 2, 3, 1).numpy()
 
+        def _psnr_trans(x):
+            x_ = x.detach().cpu().numpy()
+            min_ = np.amin(x_)
+            max_ = np.amax(x_)
+            return (x_ - min_) / (max_ - min_)
+
         self.log_dict({
             'MSE': F.mse_loss(y_hat, y),
-            'SSIM': ssim(_ssim_trans(y_hat), _ssim_trans(y), multichannel=True)
+            'SSIM': ssim(_ssim_trans(y_hat), _ssim_trans(y), multichannel=True),
+            'PSNR': psnr(image_true=_psnr_trans(y), image_test=_psnr_trans(y_hat), data_range=1)
         })
 
     def configure_optimizers(self):
