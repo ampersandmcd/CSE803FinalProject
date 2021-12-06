@@ -11,12 +11,12 @@ def main(args):
     })
     test_dl = e.test_dataloader()
 
-    # if args.model.lower() == 'srcnn':
-    #     model = SRCNN
-    # elif args.model.lower() == 'srresnet':
-    model = SRResNet
-    # elif args.model.lower() == 'vdsr':
-    #     model = VDSR
+    if args.model.lower() == 'srcnn':
+        model = SRCNN
+    elif args.model.lower() == 'srresnet':
+        model = SRResNet
+    elif args.model.lower() == 'vdsr':
+        model = VDSR
 
     model = model.load_from_checkpoint('cv-proj/vu4bzk0a/checkpoints/epoch=176-step=59825.ckpt')
 
