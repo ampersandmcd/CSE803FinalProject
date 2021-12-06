@@ -25,6 +25,15 @@ This file contains monthly average surface temperature (t2m) and precipitation (
 on a 0.1 degree grid over the United States from 1950-2020, and was extracted from the
 [ERA5 Reanalysis Dataset](https://cds.climate.copernicus.eu/cdsapp#!/dataset/reanalysis-era5-land-monthly-means?tab=overview).
 
+
+#### Testing
+
+To test a checkpointed model use
+
+```
+python test.py --model <MODEL NAME> --checkpoint </path/to/checkpoint.ckpt> --gpus=1
+```
+
 #### Group Members
 - Andrew McDonald
 - Drew Hayward

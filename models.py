@@ -22,7 +22,7 @@ class BaseModel(pl.LightningModule):
         x = batch['x'][:, self.input_channels, :, :]
         y = batch['y'][:, self.output_channels, :, :]
         y_hat = self(x)
-        loss = F.mse_loss(y, y_hat)
+        loss = F.mse_loss(y_hat, y)
         self.log('train_loss', loss)
         return loss
 
@@ -30,7 +30,7 @@ class BaseModel(pl.LightningModule):
         x = batch['x'][:, self.input_channels, :, :]
         y = batch['y'][:, self.output_channels, :, :]
         y_hat = self(x)
-        loss = F.mse_loss(y, y_hat)
+        loss = F.mse_loss(y_hat, y)
         self.log('val_loss', loss)
         
         # SSIM 
@@ -38,6 +38,19 @@ class BaseModel(pl.LightningModule):
         self.log('val_ssim', sloss)
 
         return loss
+
+    def test_step(self, batch, batch_idx):
+        x = batch['x'][:, self.input_channels, :, :]
+        y = batch['y'][:, self.output_channels, :, :]
+        y_hat = self(x)
+
+        def _ssim_trans(x):
+            return x.detach().cpu().permute(0, 2, 3, 1).numpy()
+
+        self.log_dict({
+            'MSE': F.mse_loss(y_hat, y),
+            'SSIM': ssim(_ssim_trans(y_hat), _ssim_trans(y), multichannel=True)
+        })
 
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters())
