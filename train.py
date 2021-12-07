@@ -18,7 +18,7 @@ def main(args):
         "patch_size": args.patch_size
     })
     train_dl, val_dl = e.train_dataloader(), e.val_dataloader()
-    val_samples = [e.val_data[10]]
+    val_samples = [e.val_data[0]]
 
     # input channels controls which channels we use as predictors
     # output channels controls which channels we use as targets, i.e., loss signal
@@ -43,7 +43,7 @@ def main(args):
 
     trainer: pl.Trainer = pl.Trainer.from_argparse_args(args)
     trainer.logger = wandb_logger
-    trainer.callbacks.append(ImageVisCallback(val_samples))
+    trainer.callbacks.append(ImageVisCallback(val_dl))
 
     trainer.fit(model, train_dl, val_dl)
 
