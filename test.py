@@ -55,7 +55,12 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     args.gpus = 1
-    args.model = "bicubic"
-    # args.checkpoint = "cv-proj/srresnet_resilient_water_41.ckpt"
+    # args.model = "SRCNN"
+    # args.checkpoint = "cv-proj/SRCNN-lr4-lyric-tree-103-epoch=433-step=73345.ckpt"
+    # args.model = "VDSR"
+    # args.checkpoint = "cv-proj/VDSR-lr4-balmy-sound-102-epoch=86-step=14702.ckpt"
+    # args.model = "SRResNet"
+    # args.checkpoint = "cv-proj/SRResNet-lr4-robust-capybara-101-epoch=45-step=15547.ckpt"
 
+    print(f"Loading checkpoint {args.checkpoint}")
     main(args)

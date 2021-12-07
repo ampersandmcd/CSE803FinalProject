@@ -24,10 +24,15 @@ class ERA5Data(Dataset):
         self.n_months = datasets[0].shape[0]
         self.n_vertical = datasets[0].shape[1] // patch_size
         self.n_horizontal = datasets[0].shape[2] // patch_size
+        self.mus, self.stds = [], []
         for dataset in self.datasets:
             mu = np.nanmean(dataset.values)
             s = np.nanstd(dataset.values)
             dataset.values = (dataset.values - mu) / s
+            self.mus.append(mu)
+            self.stds.append(s)
+        self.mus = np.array(self.mus).reshape((1, -1, 1, 1))
+        self.stds = np.array(self.stds).reshape((1, -1, 1, 1))
 
 
     def __len__(self):
@@ -85,10 +90,12 @@ class ERA5Data(Dataset):
 
         return {"x": input, "y": target}
 
-    def _get_batch(self, years_per_batch):
+    def _get_batch(self, years_per_batch, start_month=0, stop_month=None):
         # deprecated: gets whole-geographic batch for a given number of years
+        if stop_month is None:
+            stop_month = self.n_months
         inputs, targets = [], []
-        for month in range(self.n_months):
+        for month in range(start_month, stop_month):
             for row in range(self.n_vertical):
                 for col in range(self.n_horizontal):
                     ps = self.patch_size
@@ -176,6 +183,12 @@ class ERA5DataModule(pl.LightningDataModule):
 
     def test_dataloader(self):
         return DataLoader(self.test_data, batch_size=self.batch_size, collate_fn=self.collate_fn)
+
+    def eval_dataloader(self, pool_size):
+        # experiment with performance on non-native pool size
+        eval_data = [getattr(self.data, x)[12 * (self.test_start - 1950):12 * (self.test_end - 1950)] for x in ["t2m", "tp"]]
+        eval_data = ERA5Data(eval_data, self.patch_size, pool_size, self.pool_type)
+        return DataLoader(eval_data, batch_size=self.batch_size, collate_fn=self.collate_fn)
 
 
 if __name__ == "__main__":
