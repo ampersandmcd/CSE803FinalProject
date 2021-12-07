@@ -211,3 +211,50 @@ class SRResNet(BaseModel):
         x = self.post_layers_2(x)               # postprocess back to c x h x w
         return x
 
+
+class Nearest(BaseModel):
+    """
+    Baseline: apply nearest-neighbor upscaling from LR to HR. Because our dataloaders automatically apply
+    nearest-neighbor upscaling to ensure LR and HR are of same dimension, this model implements the identity function.
+    """
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def forward(self, x):
+        return x
+
+
+class Bilinear(BaseModel):
+    """
+    Baseline: apply bilinear interpolation-based upscaling from LR to HR. Because our dataloaders automatically apply
+    nearest-neighbor upscaling to ensure LR and HR are of same dimension, we must first downscale then upscale
+    to use prebuilt PyTorch code.
+    """
+    def __init__(self, pool_size, **kwargs):
+        super().__init__(**kwargs)
+        self.pool_size = pool_size
+        self.pool = nn.AvgPool2d(kernel_size=self.pool_size, stride=self.pool_size)
+
+    def forward(self, x):
+        size = x.shape[-1]
+        x = self.pool(x)    # note that x is already pooled and repeated; this changes size but does not change content
+        x = F.interpolate(x, size=size, mode="bilinear")
+        return x
+
+
+class Bicubic(BaseModel):
+    """
+    Baseline: apply bicubic interpolation-based upscaling from LR to HR. Because our dataloaders automatically apply
+    nearest-neighbor upscaling to ensure LR and HR are of same dimension, we must first downscale then upscale
+    to use prebuilt PyTorch code.
+    """
+    def __init__(self, pool_size, **kwargs):
+        super().__init__(**kwargs)
+        self.pool_size = pool_size
+        self.pool = nn.AvgPool2d(kernel_size=self.pool_size, stride=self.pool_size)
+
+    def forward(self, x):
+        size = x.shape[-1]
+        x = self.pool(x)  # note that x is already pooled and repeated; this changes size but does not change content
+        x = F.interpolate(x, size=size, mode="bicubic")
+        return x

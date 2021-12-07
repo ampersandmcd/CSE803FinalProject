@@ -27,15 +27,17 @@ def main(args):
     # e.g., input_channels=[1],    output_channels=[1] predicts tp @ HR using ONLY tp @ LR
     # ...etc.
     args.model = args.model if hasattr(args, "model") else "SRCNN"
-    if args.model == "VDSR":
+    if args.model.lower() == "vdsr":
         print("Constructing VDSR")
         model = VDSR(input_channels=[0, 1], output_channels=[0, 1])
-    elif args.model == "SRResNet":
+    elif args.model.lower() == "srresnet":
         print("Constructing SRResNet")
         model = SRResNet(input_channels=[0, 1], output_channels=[0, 1])
-    else:
+    elif args.model.lower() == "srcnn":
         print("Constructing SRCNN")
         model = SRCNN(input_channels=[0, 1], output_channels=[0, 1])
+    else:
+        raise ValueError("Invalid model architecture.")
 
     # Wandb logging
     wandb_logger = pl.loggers.WandbLogger(project='cv-proj')

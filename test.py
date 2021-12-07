@@ -1,7 +1,7 @@
 import argparse
 import pytorch_lightning as pl
 from data import ERA5DataModule
-from models import SRCNN, VDSR, SRResNet
+from models import SRCNN, VDSR, SRResNet, Nearest, Bilinear, Bicubic
 
 def main(args):
     e = ERA5DataModule(args={
@@ -12,13 +12,26 @@ def main(args):
     test_dl = e.test_dataloader()
 
     if args.model.lower() == 'srcnn':
+        print("Testing SRCNN")
         model = SRCNN
+        model = model.load_from_checkpoint(args.checkpoint)
     elif args.model.lower() == 'srresnet':
+        print("Testing SRResNet")
         model = SRResNet
+        model = model.load_from_checkpoint(args.checkpoint)
     elif args.model.lower() == 'vdsr':
+        print("Testing VDSR")
         model = VDSR
-
-    model = model.load_from_checkpoint(args.checkpoint)
+        model = model.load_from_checkpoint(args.checkpoint)
+    elif args.model.lower() == 'nearest':
+        print("Testing Nearest")
+        model = Nearest()
+    elif args.model.lower() == 'bilinear':
+        print("Testing Bilinear")
+        model = Bilinear(pool_size=args.pool_size)
+    elif args.model.lower() == 'bicubic':
+        print("Testing Bicubic")
+        model = Bicubic(pool_size=args.pool_size)
 
     # Wandb logging
     wandb_logger = pl.loggers.WandbLogger(project='cv-proj')
