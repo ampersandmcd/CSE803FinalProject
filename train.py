@@ -29,13 +29,13 @@ def main(args):
     args.model = args.model if hasattr(args, "model") else "SRCNN"
     if args.model == "VDSR":
         print("Constructing VDSR")
-        model = VDSR(input_channels=[0, 1], output_channels=[0, 1])
+        model = VDSR(input_channels=[0, 1], output_channels=[0, 1], learning_rate=args.learning_rate, exp_decay_rate=args.exp_decay_rate)
     elif args.model == "SRResNet":
         print("Constructing SRResNet")
-        model = SRResNet(input_channels=[0, 1], output_channels=[0, 1])
+        model = SRResNet(input_channels=[0, 1], output_channels=[0, 1], learning_rate=args.learning_rate, exp_decay_rate=args.exp_decay_rate)
     else:
         print("Constructing SRCNN")
-        model = SRCNN(input_channels=[0, 1], output_channels=[0, 1])
+        model = SRCNN(input_channels=[0, 1], output_channels=[0, 1], learning_rate=args.learning_rate, exp_decay_rate=args.exp_decay_rate)
 
     # Wandb logging
     wandb_logger = pl.loggers.WandbLogger(project='cv-proj')
@@ -55,6 +55,8 @@ if __name__ == "__main__":
     parser.add_argument('--batch_size', default=128, type=int, help="Batch size to train with")
     parser.add_argument('--pool_size', default=4, type=int, help="Super-resolution factor")
     parser.add_argument('--patch_size', default=64, type=int, help="Image patch size to super-resolve")
+    parser.add_argument('--learning_rate', default=1e-3, type=float, help="Learning rate for the model")
+    parser.add_argument('--exp_decay_rate', default=0.9, type=float, help="Exponential decay rate for the model")
     args = parser.parse_args()
 
     main(args)
