@@ -2,7 +2,7 @@ import os
 import torch
 import wandb
 import pytorch_lightning as pl
-import matplotlib.pyplot as plt
+
 
 class ImageVisCallback(pl.Callback):
     def __init__(self, val_Dataloader, max_samples=10):

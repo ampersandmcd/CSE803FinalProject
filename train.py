@@ -28,7 +28,7 @@ def main(args):
     args.model = args.model if hasattr(args, "model") else "SRCNN"
     if args.model.lower() == "vdsr":
         print("Constructing VDSR")
-        model = VDSR(input_channels=[0, 1], output_channels=[0, 1], lr=args.lr)
+        model = VDSR(input_channels=[0, 1], output_channels=[0, 1], lr=args.lr, decayRate=args.decay_Rate)
     elif args.model.lower() == "srresnet":
         print("Constructing SRResNet")
         model = SRResNet(input_channels=[0, 1], output_channels=[0, 1], lr=args.lr)
@@ -57,6 +57,7 @@ if __name__ == "__main__":
     parser.add_argument('--pool_size', default=4, type=int, help="Super-resolution factor")
     parser.add_argument('--patch_size', default=64, type=int, help="Image patch size to super-resolve")
     parser.add_argument('--lr', default=1e-3, type=float, help="Learning rate")
+    parser.add_argument("--decay_Rate", default=1, typep=float, help="Exponential decay rate")
     args = parser.parse_args()
 
     main(args)
