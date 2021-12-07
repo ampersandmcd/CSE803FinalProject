@@ -54,5 +54,8 @@ if __name__ == "__main__":
     parser.add_argument('--patch_size', default=64, type=int, help="Image patch size to super-resolve")
 
     args = parser.parse_args()
+    args.gpus = 1
+    args.model = "bicubic"
+    # args.checkpoint = "cv-proj/srresnet_resilient_water_41.ckpt"
 
     main(args)

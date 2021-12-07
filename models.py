@@ -147,7 +147,7 @@ class VDSR(BaseModel):
 
         # construct layer after blocks and residual connection
         post_layers = [
-            nn.Conv2d(in_channels=self.hidden_dim, out_channels=self.hidden_dim, kernel_size=self.pre_post_kernel, padding="same", padding_mode="replicate"),
+            nn.Conv2d(in_channels=self.hidden_dim, out_channels=self.output_dim, kernel_size=self.pre_post_kernel, padding="same", padding_mode="replicate"),
         ]
         self.post_layers = nn.Sequential(*post_layers)
 
