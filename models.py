@@ -122,20 +122,22 @@ class VDSR(BaseModel):
             d: int = 20,                # d=20 in the paper
             kernel: int = 3,            # k=3 in the paper
             hidden_dim: int = 64,       # hidden_dim=64 in the paper
+            pre_post_kernel: int = 9,   # not in paper, but we draw inspiration from SRCNN and SRResNet
             **kwargs
     ):
         super().__init__(**kwargs)
         self.d = d
         self.kernel = kernel
         self.hidden_dim = hidden_dim
+        self.pre_post_kernel = pre_post_kernel
 
         layers = []
-        layers.append(nn.Conv2d(in_channels=self.input_dim, out_channels=self.hidden_dim, kernel_size=self.kernel, padding="same", padding_mode="replicate"))
+        layers.append(nn.Conv2d(in_channels=self.input_dim, out_channels=self.hidden_dim, kernel_size=self.pre_post_kernel, padding="same", padding_mode="replicate"))
         layers.append(nn.ReLU())
         for _ in range(d-2):
             layers.append(nn.Conv2d(in_channels=self.hidden_dim, out_channels=self.hidden_dim, kernel_size=self.kernel, padding="same", padding_mode="replicate"))
             layers.append(nn.ReLU())
-        layers.append(nn.Conv2d(in_channels=self.hidden_dim, out_channels=self.output_dim, kernel_size=self.kernel, padding="same", padding_mode="replicate"))
+        layers.append(nn.Conv2d(in_channels=self.hidden_dim, out_channels=self.output_dim, kernel_size=self.pre_post_kernel, padding="same", padding_mode="replicate"))
         self.layers = nn.Sequential(*layers)
 
     def forward(self, x):
