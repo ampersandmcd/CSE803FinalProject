@@ -12,7 +12,8 @@ class BaseModel(pl.LightningModule):
             self,
             input_channels: list = [0, 1],      # indices of tensor input channels to consider (0=t2m, 1=tp)
             output_channels: list = [0, 1],     # indices of tensor target channels to predict (0=t2m, 1=tp)
-            lr: float = 1e-3
+            lr: float = 1e-3,
+            decayRate = 1
     ):
         super().__init__()
         self.save_hyperparameters()
@@ -21,6 +22,7 @@ class BaseModel(pl.LightningModule):
         self.output_channels = output_channels
         self.input_dim = len(input_channels)
         self.output_dim = len(output_channels)
+        self.decayRate = decayRate
 
     def training_step(self, batch, batch_idx):
         x = batch['x'][:, self.input_channels, :, :]
@@ -59,7 +61,12 @@ class BaseModel(pl.LightningModule):
         })
 
     def configure_optimizers(self):
-        return torch.optim.AdamW(self.parameters(), lr=self.lr)
+        opt = torch.optim.Adam(self.parameters(), lr=self.learning_rate)
+        return {
+            'optimizer': opt,
+            'lr_scheduler': torch.optim.lr_scheduler.ExponentialLR(opt, self.exp_decay_rate)
+        }
+
 
 
 class SRCNN(BaseModel):
