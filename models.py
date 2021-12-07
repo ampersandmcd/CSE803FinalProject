@@ -131,17 +131,30 @@ class VDSR(BaseModel):
         self.hidden_dim = hidden_dim
         self.pre_post_kernel = pre_post_kernel
 
-        layers = []
-        layers.append(nn.Conv2d(in_channels=self.input_dim, out_channels=self.hidden_dim, kernel_size=self.pre_post_kernel, padding="same", padding_mode="replicate"))
-        layers.append(nn.ReLU())
+        # construct layer before blocks
+        pre_layers = [
+            nn.Conv2d(in_channels=self.input_dim, out_channels=self.hidden_dim, kernel_size=self.pre_post_kernel, padding="same", padding_mode="replicate"),
+            nn.ReLU()
+        ]
+        self.pre_layers = nn.Sequential(*pre_layers)
+
+        # construct main set of blocks
+        blocks = []
         for _ in range(d-2):
-            layers.append(nn.Conv2d(in_channels=self.hidden_dim, out_channels=self.hidden_dim, kernel_size=self.kernel, padding="same", padding_mode="replicate"))
-            layers.append(nn.ReLU())
-        layers.append(nn.Conv2d(in_channels=self.hidden_dim, out_channels=self.output_dim, kernel_size=self.pre_post_kernel, padding="same", padding_mode="replicate"))
-        self.layers = nn.Sequential(*layers)
+            blocks.append(nn.Conv2d(in_channels=self.hidden_dim, out_channels=self.hidden_dim, kernel_size=self.kernel, padding="same", padding_mode="replicate"))
+            blocks.append(nn.ReLU())
+        self.blocks = nn.Sequential(*blocks)
+
+        # construct layer after blocks and residual connection
+        post_layers = [
+            nn.Conv2d(in_channels=self.hidden_dim, out_channels=self.hidden_dim, kernel_size=self.pre_post_kernel, padding="same", padding_mode="replicate"),
+        ]
+        self.post_layers = nn.Sequential(*post_layers)
 
     def forward(self, x):
-        x = x + self.layers(x)
+        x = self.pre_layers(x)  # preprocess input to hidden_dim x h x w
+        x = x + self.blocks(x)  # apply post-block skip connection
+        x = self.post_layers(x)     # postprocess back to c x h x w
         return x
 
 
