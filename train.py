@@ -18,7 +18,6 @@ def main(args):
         "patch_size": args.patch_size
     })
     train_dl, val_dl = e.train_dataloader(), e.val_dataloader()
-    val_samples = [e.val_data[0]]
 
     # input channels controls which channels we use as predictors
     # output channels controls which channels we use as targets, i.e., loss signal
@@ -29,13 +28,13 @@ def main(args):
     args.model = args.model if hasattr(args, "model") else "SRCNN"
     if args.model.lower() == "vdsr":
         print("Constructing VDSR")
-        model = VDSR(input_channels=[0, 1], output_channels=[0, 1])
+        model = VDSR(input_channels=[0, 1], output_channels=[0, 1], lr=args.lr)
     elif args.model.lower() == "srresnet":
         print("Constructing SRResNet")
-        model = SRResNet(input_channels=[0, 1], output_channels=[0, 1])
+        model = SRResNet(input_channels=[0, 1], output_channels=[0, 1], lr=args.lr)
     elif args.model.lower() == "srcnn":
         print("Constructing SRCNN")
-        model = SRCNN(input_channels=[0, 1], output_channels=[0, 1])
+        model = SRCNN(input_channels=[0, 1], output_channels=[0, 1], lr=args.lr)
     else:
         raise ValueError("Invalid model architecture.")
 
@@ -57,6 +56,7 @@ if __name__ == "__main__":
     parser.add_argument('--batch_size', default=128, type=int, help="Batch size to train with")
     parser.add_argument('--pool_size', default=4, type=int, help="Super-resolution factor")
     parser.add_argument('--patch_size', default=64, type=int, help="Image patch size to super-resolve")
+    parser.add_argument('--lr', default=1e-3, type=float, help="Learning rate")
     args = parser.parse_args()
 
     main(args)

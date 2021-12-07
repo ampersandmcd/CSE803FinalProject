@@ -12,9 +12,11 @@ class BaseModel(pl.LightningModule):
             self,
             input_channels: list = [0, 1],      # indices of tensor input channels to consider (0=t2m, 1=tp)
             output_channels: list = [0, 1],     # indices of tensor target channels to predict (0=t2m, 1=tp)
+            lr: float = 1e-3
     ):
         super().__init__()
         self.save_hyperparameters()
+        self.lr = lr
         self.input_channels = input_channels
         self.output_channels = output_channels
         self.input_dim = len(input_channels)
@@ -34,8 +36,6 @@ class BaseModel(pl.LightningModule):
         y_hat = self(x)
         loss = F.mse_loss(y_hat, y)
         self.log('val_loss', loss)
-        
-
         return loss
 
     def test_step(self, batch, batch_idx):
@@ -59,7 +59,7 @@ class BaseModel(pl.LightningModule):
         })
 
     def configure_optimizers(self):
-        return torch.optim.Adam(self.parameters())
+        return torch.optim.AdamW(self.parameters(), lr=self.lr)
 
 
 class SRCNN(BaseModel):
