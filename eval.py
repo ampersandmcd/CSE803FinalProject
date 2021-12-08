@@ -125,8 +125,12 @@ if __name__ == "__main__":
 
     # test also on 8x for April 2020
     eval_dl_8x = e.eval_dataloader(pool_size=8)
+    models["Bilinear"] = Bilinear(pool_size=8)
+    models["Bicubic"] = Bilinear(pool_size=8)
     visualize_preds(eval_dl_8x, models, suptitle=f"Predictions 8x (4/2020)", file_name=f"preds_2020_4_pool_8.png")
 
     # test also on 16x for April 2020
     eval_dl_16x = e.eval_dataloader(pool_size=16)
+    models["Bilinear"] = Bilinear(pool_size=16)
+    models["Bicubic"] = Bilinear(pool_size=16)
     visualize_preds(eval_dl_16x, models, suptitle=f"Predictions 16x (4/2020)", file_name=f"preds_2020_4_pool_16.png")

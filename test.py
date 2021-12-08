@@ -32,6 +32,7 @@ def main(args):
     elif args.model.lower() == 'bicubic':
         print("Testing Bicubic")
         model = Bicubic(pool_size=args.pool_size)
+    print(f"Number of parameters: {sum(p.numel() for p in model.parameters())}")
 
     # Wandb logging
     wandb_logger = pl.loggers.WandbLogger(project='cv-proj')
