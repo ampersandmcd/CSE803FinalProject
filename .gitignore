@@ -22,9 +22,6 @@
 *.cpg
 *.xml
 
-# ignore PDFs
-*.pdf
-
 # ignore videos
 *.mp4
 
