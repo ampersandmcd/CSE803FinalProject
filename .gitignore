@@ -20,7 +20,7 @@
 *.dbf
 *.prj
 *.cpg
-*.xml
+*.xml   
 
 # ignore videos
 *.mp4
